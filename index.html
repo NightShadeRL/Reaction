@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Reaction Timer</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      background-color: #1a1a1a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: Arial, sans-serif;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    #reactionTime {
+      font-size: 3em;
+      color: black;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="reactionTime">Click anywhere to start</div>
+
+  <script>
+    const body = document.body;
+    const reactionTimeDisplay = document.getElementById('reactionTime');
+
+    let state = "idle"; // "idle", "waiting", "ready", "result"
+    let startTime = 0;
+    let timeoutID;
+
+    function reset() {
+      body.style.backgroundColor = "darkred";
+      reactionTimeDisplay.textContent = "Click anywhere to start";
+      reactionTimeDisplay.style.display = "block";
+      state = "idle";
+      startTime = 0;
+    }
+
+    function startWaiting() {
+      reactionTimeDisplay.textContent = "Wait for green...";
+      reactionTimeDisplay.style.display = "block";
+      body.style.backgroundColor = "darkred";
+      state = "waiting";
+      const delay = Math.random() * 3000 + 2000; // 2–5s
+
+      timeoutID = setTimeout(() => {
+        body.style.backgroundColor = "green";
+        startTime = Date.now();
+        state = "ready";
+      }, delay);
+    }
+
+    function showReactionTime() {
+      const reaction = Date.now() - startTime;
+      reactionTimeDisplay.textContent = `${reaction} ms`;
+      reactionTimeDisplay.style.display = "block";
+      state = "result";
+    }
+
+    function showTooSoon() {
+      clearTimeout(timeoutID);
+      reactionTimeDisplay.textContent = "Too soon!";
+      reactionTimeDisplay.style.display = "block";
+      state = "result";
+    }
+
+    body.addEventListener("click", () => {
+      switch (state) {
+        case "idle":
+          startWaiting();
+          break;
+        case "waiting":
+          showTooSoon();
+          break;
+        case "ready":
+          showReactionTime();
+          break;
+        case "result":
+          reset();
+          break;
+      }
+    });
+
+    // Initial message
+    reactionTimeDisplay.style.display = "block";
+  </script>
+</body>
+</html>
